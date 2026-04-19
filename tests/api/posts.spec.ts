@@ -1,5 +1,6 @@
 import {test, expect } from "@playwright/test";
 import { Post, validatePostContract } from "../../utils/posts-validators";
+import { request } from "node:http";
 
 test.describe("Tests about Posts API", () => {
     test("GET - Obtener todos los resultados de Posts", async ({ request }) => {
@@ -41,4 +42,13 @@ test.describe("Tests about Posts API", () => {
             validatePostContract(post); 
         }
     });
+
+    test("GET - Filtrar posts por userID que no existe", async ({ request }) => {
+        const userIdWithoutPosts = 999; 
+        const response = await request.get(`/posts?userId=${userIdWithoutPosts}`); 
+        expect(response.status()).toBe(200); 
+
+        const posts: Post[] = await response.json(); 
+        expect(posts.length).toBe(0);
+    }); 
 });
