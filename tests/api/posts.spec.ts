@@ -1,4 +1,4 @@
-import {test, expect, request } from "@playwright/test";
+import {test, expect } from "@playwright/test";
 import { Post, validatePostContract } from "../../utils/posts-validators";
 
 test.describe("Tests about Posts API", () => {
@@ -20,4 +20,11 @@ test.describe("Tests about Posts API", () => {
         const post: Post = await response.json();         
         validatePostContract(post);  
     }); 
+
+    test("GET - Solicitar un post con ID que no existe", async ({ request }) => {
+        const response = await request.get("/posts/666", {
+            failOnStatusCode: false,
+        }); 
+        expect(response.status()).toBe(404);
+    });
 });
