@@ -13,4 +13,11 @@ test.describe("Tests about Posts API", () => {
             validatePostContract(post); 
         }
     });
+
+    test("GET - Obtener un post por ID", async ({ request }) => {
+        const response = await request.get("/posts/1"); 
+        expect(response.status()).toBe(200); 
+        const post: Post = await response.json();         
+        validatePostContract(post);  
+    }); 
 });
