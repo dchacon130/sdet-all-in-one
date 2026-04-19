@@ -27,4 +27,18 @@ test.describe("Tests about Posts API", () => {
         }); 
         expect(response.status()).toBe(404);
     });
+
+    test("GET - Filtrar posts por userID", async ({ request }) => {
+        const userIdFilter = 1; 
+        const response = await request.get(`/posts?userId=${userIdFilter}`); 
+        expect(response.status()).toBe(200); 
+
+        const posts: Post[] = await response.json(); 
+        expect(posts.length).toBeGreaterThan(0);
+
+        for (const post of posts){
+            expect(post.userId).toBe(userIdFilter); 
+            validatePostContract(post); 
+        }
+    });
 });
