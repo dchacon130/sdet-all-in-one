@@ -1,0 +1,13 @@
+{
+  "name": "sdet-all-in-one",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/dchacon130/sdet-all-in-one.git",
+  "author": "Diego Chacon <dchacon130@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.59.1",
+    "@types/node": "^25.6.0"
+  },
+  "scripts": {}
+}
