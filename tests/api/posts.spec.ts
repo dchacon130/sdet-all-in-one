@@ -61,7 +61,7 @@ test.describe("Tests about Posts API", () => {
                 "title": "optio molestias id quia eum",
                 "body": "quo et expedita modi cum officia vel magni"
             }*/
-            const newPostData = createPostPayload();
+            const newPostData = createPostPayload({ title: "Mi Post de Prueba" });
             const response = await request.post("/posts", {
                 data: newPostData,
             });
@@ -110,6 +110,53 @@ test.describe("Tests about Posts API", () => {
             const responseBody = await response.json(); 
             expect(responseBody).toMatchObject(updatePostData);
         }); 
+
+        test("PUT - Actualizar un post que no existe", async ({ request }) => {
+            const nonExistentPostId = 9999;
+            const updateData = {
+                id: nonExistentPostId, 
+                title: 'Updated Title',
+                body: 'Updated body content for the post.',
+                userId: 1,
+            }
+
+            const response = await request.put(`/posts/${nonExistentPostId}`, {
+                data: updateData, 
+                failOnStatusCode: false, 
+            }); 
+
+            expect(response.status()).toBe(500);
+        });
     });
 
+    test.describe("DELETE Methods", () => {
+        test("DELETE - Eliminar un post existente", async ({ request }) => {
+            // Crear un post nuevo
+            const newPostData = createPostPayload({ title: "Post to be deleted" });
+            const createResponse = await request.post("/posts", {
+                data: newPostData,
+            });
+            expect(createResponse.status()).toBe(201);
+            const createPost = await createResponse.json(); 
+            const postIdToDelete = createPost.id; 
+            //Eliminar el post creado
+            const deleteResponse = await request.delete(`/posts/${postIdToDelete}`);
+            expect(deleteResponse.status()).toBe(200);
+            // Verificar que el post fue eliminado
+            const getResponse = await request.get(`/posts/${postIdToDelete}`, {
+                failOnStatusCode: false, 
+            });
+            expect(getResponse.status()).toBe(404);
+        }); 
+
+        test("DELETE - Eliminar un post que no existe", async ({ request }) => {
+            const nonExistentPostId = 9999;
+            const response = await request.delete(`/posts/${nonExistentPostId}`, {
+                failOnStatusCode: false, 
+            }); 
+            expect(response.status()).toBe(200);
+        });
+    });
+
+    
 });

@@ -1,9 +1,3 @@
-export interface NewPostPayload{
-    userId: number;
-    title: string;
-    body: string;
-}
-
 interface PostPayloadOverrides {
     userId?: number; 
     title?: string;
