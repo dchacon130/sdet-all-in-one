@@ -84,10 +84,32 @@ test.describe("Tests about Posts API", () => {
             }); 
             expect(response.status()).toBe(201);
 
-            const createdPost: Post = await response.json();
+            const createdPost = await response.json();
             expect(createdPost).not.toHaveProperty("title"); 
             expect(createdPost.body).toBe(dataIncompleta.body); 
             expect(createdPost).toHaveProperty("id"); 
-        }); 
+        });  
     }); 
+
+    test.describe("PUT Methods", () => {
+        test("PUT - Actualizar un post existente", async ({ request }) => {
+
+            const updatePostData = {
+                id: 1, 
+                title: 'Updated Title',
+                body: 'Updated body content for the post.',
+                userId: 1,
+            }
+
+            const response = await request.put(`/posts/1`, {
+                data: updatePostData, 
+            });
+
+            expect(response.status()).toBe(200);
+
+            const responseBody = await response.json(); 
+            expect(responseBody).toMatchObject(updatePostData);
+        }); 
+    });
+
 });
