@@ -1,6 +1,7 @@
 import {test, expect } from "@playwright/test";
 import { Post, validatePostContract } from "../../utils/posts-validators";
 import { createPostPayload } from "../../utils/posts-factory";
+import { APIClient } from "../../helpers/api-client";
 
 test.describe("Tests about Posts API", () => {
     test.describe("GET Methods", () => {
@@ -17,7 +18,9 @@ test.describe("Tests about Posts API", () => {
         });
 
         test("GET - Obtener un post por ID", async ({ request }) => {
-            const response = await request.get("/posts/1"); 
+            //const response = await request.get("/posts/1"); 
+            const apiClient = new APIClient(request); 
+            const response = await apiClient.posts.getById(1);
             expect(response.status()).toBe(200); 
             const post: Post = await response.json();         
             validatePostContract(post);  
@@ -61,7 +64,7 @@ test.describe("Tests about Posts API", () => {
                 "title": "optio molestias id quia eum",
                 "body": "quo et expedita modi cum officia vel magni"
             }*/
-            const newPostData = createPostPayload();
+            const newPostData = createPostPayload({ title: "Mi Post de Prueba" });
             const response = await request.post("/posts", {
                 data: newPostData,
             });
@@ -84,10 +87,103 @@ test.describe("Tests about Posts API", () => {
             }); 
             expect(response.status()).toBe(201);
 
-            const createdPost: Post = await response.json();
+            const createdPost = await response.json();
             expect(createdPost).not.toHaveProperty("title"); 
             expect(createdPost.body).toBe(dataIncompleta.body); 
             expect(createdPost).toHaveProperty("id"); 
+        });  
+    }); 
+
+    test.describe("PUT Methods", () => {
+        test("PUT - Actualizar un post existente", async ({ request }) => {
+
+            const updatePostData = {
+                id: 1, 
+                title: 'Updated Title',
+                body: 'Updated body content for the post.',
+                userId: 1,
+            }
+
+            const response = await request.put(`/posts/1`, {
+                data: updatePostData, 
+            });
+
+            expect(response.status()).toBe(200);
+
+            const responseBody = await response.json(); 
+            expect(responseBody).toMatchObject(updatePostData);
+        }); 
+
+        test("PUT - Actualizar un post que no existe", async ({ request }) => {
+            const nonExistentPostId = 9999;
+            const updateData = {
+                id: nonExistentPostId, 
+                title: 'Updated Title',
+                body: 'Updated body content for the post.',
+                userId: 1,
+            }
+
+            const response = await request.put(`/posts/${nonExistentPostId}`, {
+                data: updateData, 
+                failOnStatusCode: false, 
+            }); 
+
+            expect(response.status()).toBe(500);
+        });
+    });
+
+    test.describe("DELETE Methods", () => {
+        test("DELETE - Eliminar un post existente", async ({ request }) => {
+            // Crear un post nuevo
+            const newPostData = createPostPayload({ title: "Post to be deleted" });
+            const createResponse = await request.post("/posts", {
+                data: newPostData,
+            });
+            expect(createResponse.status()).toBe(201);
+            const createPost = await createResponse.json(); 
+            const postIdToDelete = createPost.id; 
+            //Eliminar el post creado
+            const deleteResponse = await request.delete(`/posts/${postIdToDelete}`);
+            expect(deleteResponse.status()).toBe(200);
+            // Verificar que el post fue eliminado
+            const getResponse = await request.get(`/posts/${postIdToDelete}`, {
+                failOnStatusCode: false, 
+            });
+            expect(getResponse.status()).toBe(404);
+        }); 
+
+        test("DELETE - Eliminar un post que no existe", async ({ request }) => {
+            const nonExistentPostId = 9999;
+            const response = await request.delete(`/posts/${nonExistentPostId}`, {
+                failOnStatusCode: false, 
+            }); 
+            expect(response.status()).toBe(200);
+        });
+    });
+
+    test.describe("PATCH Methods", () => {
+        test("PATCH - Modifica parcialmente un post existente", async ({ request }) => {
+            // 1. Obtenemos el estado actual del post para tener una base real y no hardcodeada.
+            const getResponse = await request.get('/posts/1');
+            expect(getResponse.ok()).toBeTruthy();
+            const initialPostData = await getResponse.json();
+
+            // 2. Definimos la actualización parcial.
+            const partialUpdate = {
+                title: 'Partially Updated Title',
+            }; 
+
+            // 3. Aplicamos el PATCH.
+            const patchResponse = await request.patch(`/posts/1`, {
+                data: partialUpdate
+            }); 
+            expect(patchResponse.status()).toBe(200);
+            const patchedPost = await patchResponse.json();
+
+            // 4. Validamos que solo el título cambió y el resto se mantuvo como estaba.
+            expect(patchedPost.title).toBe(partialUpdate.title);
+            expect(patchedPost.body).toBe(initialPostData.body);
+            expect(patchedPost.userId).toBe(initialPostData.userId);
         }); 
     }); 
 });
