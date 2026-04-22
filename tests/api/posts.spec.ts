@@ -158,5 +158,28 @@ test.describe("Tests about Posts API", () => {
         });
     });
 
-    
+    test.describe("PATCH Methods", () => {
+        test("PATCH - Modifica parcialmente un post existente", async ({ request }) => {
+            const initialPostData = {
+                id: 1, 
+                title: 'Initial Title',
+                body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto',
+                userId: 1,
+            }; 
+
+            const partialUpdate = {
+                title: 'Partially Updated Title',
+            }; 
+
+            const response = await request.patch(`/posts/1`, {
+                data: partialUpdate
+            }); 
+            expect(response.status()).toBe(200);
+            const patchedPost = await response.json();
+
+            expect(patchedPost.title).toBe(partialUpdate.title);
+            expect(patchedPost.body).toBe(initialPostData.body);
+            expect(patchedPost.userId).toBe(initialPostData.userId);
+        }); 
+    }); 
 });
