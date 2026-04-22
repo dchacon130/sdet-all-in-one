@@ -1,6 +1,7 @@
 import {test, expect } from "@playwright/test";
 import { Post, validatePostContract } from "../../utils/posts-validators";
 import { createPostPayload } from "../../utils/posts-factory";
+import { APIClient } from "../../helpers/api-client";
 
 test.describe("Tests about Posts API", () => {
     test.describe("GET Methods", () => {
@@ -17,7 +18,9 @@ test.describe("Tests about Posts API", () => {
         });
 
         test("GET - Obtener un post por ID", async ({ request }) => {
-            const response = await request.get("/posts/1"); 
+            //const response = await request.get("/posts/1"); 
+            const apiClient = new APIClient(request); 
+            const response = await apiClient.posts.getById(1);
             expect(response.status()).toBe(200); 
             const post: Post = await response.json();         
             validatePostContract(post);  

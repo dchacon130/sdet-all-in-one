@@ -8,11 +8,19 @@ export interface Post {
 }
 
 export function validatePostContract(post: any) {
-    expect(post).toHaveProperty("userId");
+    /*expect(post).toHaveProperty("userId");
     expect(post).toHaveProperty("id");
     expect(post).toHaveProperty("title");
     expect(post).toHaveProperty("body");
 
     expect(typeof post.id).toBe("number");
-    expect(typeof post.title).toBe("string");
+    expect(typeof post.title).toBe("string");*/
+
+    expect(post).toMatchObject({
+        userId: expect.any(Number),
+        id: expect.any(Number),
+        title: expect.any(String),
+        body: expect.any(String),
+    });
+
 }
