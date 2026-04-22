@@ -163,7 +163,7 @@ test.describe("Tests about Posts API", () => {
             const initialPostData = {
                 id: 1, 
                 title: 'Initial Title',
-                body: 'Initial body content for the post.',
+                body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto',
                 userId: 1,
             }; 
 
@@ -178,8 +178,8 @@ test.describe("Tests about Posts API", () => {
             const patchedPost = await response.json();
 
             expect(patchedPost.title).toBe(partialUpdate.title);
-            expect(patchedPost.body).toBe(initialPostData.body); 
-            expect(patchedPost.userId).toBe(initialPostData.userId); 
+            expect(patchedPost.body).toBe(initialPostData.body);
+            expect(patchedPost.userId).toBe(initialPostData.userId);
         }); 
     }); 
 });
