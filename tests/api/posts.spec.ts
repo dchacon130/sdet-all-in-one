@@ -163,23 +163,24 @@ test.describe("Tests about Posts API", () => {
 
     test.describe("PATCH Methods", () => {
         test("PATCH - Modifica parcialmente un post existente", async ({ request }) => {
-            const initialPostData = {
-                id: 1, 
-                title: 'Initial Title',
-                body: 'quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto',
-                userId: 1,
-            }; 
+            // 1. Obtenemos el estado actual del post para tener una base real y no hardcodeada.
+            const getResponse = await request.get('/posts/1');
+            expect(getResponse.ok()).toBeTruthy();
+            const initialPostData = await getResponse.json();
 
+            // 2. Definimos la actualización parcial.
             const partialUpdate = {
                 title: 'Partially Updated Title',
             }; 
 
-            const response = await request.patch(`/posts/1`, {
+            // 3. Aplicamos el PATCH.
+            const patchResponse = await request.patch(`/posts/1`, {
                 data: partialUpdate
             }); 
-            expect(response.status()).toBe(200);
-            const patchedPost = await response.json();
+            expect(patchResponse.status()).toBe(200);
+            const patchedPost = await patchResponse.json();
 
+            // 4. Validamos que solo el título cambió y el resto se mantuvo como estaba.
             expect(patchedPost.title).toBe(partialUpdate.title);
             expect(patchedPost.body).toBe(initialPostData.body);
             expect(patchedPost.userId).toBe(initialPostData.userId);
