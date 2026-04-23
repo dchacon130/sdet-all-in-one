@@ -1,7 +1,7 @@
 import {test, expect } from "@playwright/test";
-import { Post, validatePostContract } from "../../utils/posts-validators";
-import { createPostPayload } from "../../utils/posts-factory";
-import { APIClient } from "../../helpers/api-client";
+import { Post, validatePostContract } from "../utils/posts-validators";
+import { createPostPayload } from "../utils/posts-factory";
+import { APIClient } from "../helpers/api-client";
 
 test.describe("Tests about Posts API", () => {
     test.describe("GET Methods", () => {
